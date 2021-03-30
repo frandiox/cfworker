@@ -7,7 +7,7 @@ import { verifyJwtSignature } from './verify.js';
  */
 export async function parseJwt(
   encodedToken: string,
-  issuerOrigin: string,
+  issuer: string,
   audience: string
 ): Promise<JwtParseResult> {
   let decoded: DecodedJwt;
@@ -16,7 +16,10 @@ export async function parseJwt(
   } catch {
     return { valid: false, reason: `Unable to decode JWT.` };
   }
-  if (decoded.header.typ !== 'JWT') {
+  if (
+    typeof decoded.header.typ !== 'undefined' &&
+    decoded.header.typ !== 'JWT'
+  ) {
     return {
       valid: false,
       reason: `Invalid JWT type "${decoded.header.typ}". Expected "JWT".`
@@ -34,11 +37,11 @@ export async function parseJwt(
       reason: `Invalid JWT audience "${decoded.payload.aud}". Expected "${audience}".`
     };
   }
-  const iss = new URL(decoded.payload.iss);
-  if (iss.origin !== issuerOrigin) {
+
+  if (decoded.payload.iss !== issuer) {
     return {
       valid: false,
-      reason: `Invalid JWT issuer "${decoded.payload.iss}". Expected "${issuerOrigin}".`
+      reason: `Invalid JWT issuer "${decoded.payload.iss}". Expected "${issuer}".`
     };
   }
   const expiryDate = new Date(0);

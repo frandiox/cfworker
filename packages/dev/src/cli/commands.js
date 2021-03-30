@@ -50,7 +50,7 @@ function collect(value, previous) {
 program
   .command('test [input...]')
   .description('run tests')
-  .option('-p, --port <port>', 'set the port to serve on', parseInt, 7000)
+  .option('-p, --port <port>', 'set the port to serve on', p => +p, 7000)
   .option('-w, --watch', 'enable watch mode', false)
   .option('-i, --inspect', 'open browser window with devtools enabled', false)
   .option('-n --nocheck', 'disable diagnostic checks on TypeScript code')
@@ -73,7 +73,7 @@ program
 program
   .command('run [input...]')
   .description('run worker script')
-  .option('-p, --port <port>', 'set the port to serve on', parseInt, 7000)
+  .option('-p, --port <port>', 'set the port to serve on', p => +p, 7000)
   .option('-w, --watch', 'enable watch mode', false)
   .option('-i, --inspect', 'open browser window with devtools enabled', false)
   .option('-n --nocheck', 'disable diagnostic checks on TypeScript code')
@@ -132,9 +132,8 @@ program
   )
   .option('-s --site <directory>', 'static site directory')
   .option('-k --kv <filename>', 'kv json file', collect, [])
-  .action((main, command) => {
+  .action((main, options) => {
     loadEnv('production');
-    const options = command.opts();
     currentCommand = new DeployCommand({
       entry: main[0],
       name: options.name,
